@@ -1,13 +1,13 @@
 import torch.nn as nn
 
-class Net(nn.Module):
+class ConvLSTM(nn.Module):
 
     def __init__(self, in_channels,  out_channels, kernel_size):
-        super(Net, self).__init__()
+        super(ConvLSTM, self).__init__()
 
         self.forget_conv = nn.Conv2d(in_channels, out_channels, kernel_size)
         self.input_conv = nn.Conv2d(in_channels, out_channels, kernel_size)
-        self.update_conv = nn.Conv2d(in_channels, out_channels, kernel_size)
+        self.update_conv = nn .Conv2d(in_channels, out_channels, kernel_size)
         self.output_conv = nn.Conv2d(in_channels, out_channels, kernel_size)
 
     def forward(self, input, state):
