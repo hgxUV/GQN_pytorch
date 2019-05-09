@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as func
 
 
-class Tower():
+class Tower(nn.Module):
     def __init__(self):
         self.layer1 = nn.Sequential(
             nn.Conv2d(3, 256, kernel_size=2, stride=2),
