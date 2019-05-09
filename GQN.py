@@ -17,7 +17,9 @@ class Generator:
 class Inference:
     def __init__(self):
         self.clstm = ConvLSTM(552, 256, 5)
+        self.downsample = nn.Conv2D(256, 256, 5, 2)
 
-    def forward(self, x_query, v_query, r, z, gen_hidden, state, hidden):
-        hidden, state = self.clstm(torch.cat([x_query, v_query, r, z, gen_hidden, hidden]), state)
+    def forward(self, x_query, v_query, r, z, u, gen_hidden, state, hidden):
+        downsampled_u = self.downsample(u)
+        hidden, state = self.clstm(torch.cat([x_query, v_query, r, z, downsampled_u, gen_hidden, hidden]), state)
         return hidden, state
