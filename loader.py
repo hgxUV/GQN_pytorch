@@ -1,6 +1,8 @@
 import os
 import gzip
 import torch
+import numpy as np
+
 
 def collect_files(path, ext=None, key=None):
     if key is None:
@@ -37,23 +39,7 @@ class GQNDataset:
         images_seqs = np.array(images_list)
         poses_seqs = np.array(poses_list)
 
-        return images_seqs
+        return images_seqs, poses_seqs
 
 
-if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-    import numpy as np
 
-    ds = GQNDataset(mode='train', base_dir='data', scene='rooms_ring_camera')
-    images_list = ds[0]
-
-    n = 6
-    f = plt.figure(figsize=(12, 8))
-    axes = f.subplots(nrows=n, ncols=1, sharex=True, sharey=True)
-    for i in range(n):
-        images = images_list[i]
-        grid = np.hstack(images[:10])
-        axes[i].imshow(grid)
-
-    plt.show()
-    a = 15
