@@ -36,7 +36,7 @@ class GQNDataset:
             data = torch.load(f)
 
         images_list, poses_list = list(zip(*data))
-        images_seqs = np.array(images_list)
+        images_seqs = np.array(images_list).astype('float32')
         poses_seqs = np.array(poses_list)
         pos = poses_seqs[:, :, 0:3]
         yaw = poses_seqs[:, :, 3:4]
