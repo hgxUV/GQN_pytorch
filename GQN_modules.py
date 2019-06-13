@@ -30,13 +30,13 @@ class Inference(nn.Module):
     def __init__(self):
         super(Inference, self).__init__()
 
-        self.clstm = ConvLSTM(552, 256, 5)
-        self.downsample = nn.Conv2d(256, 256, 5, 2)
+        self.clstm = ConvLSTM(1034, 256, 5)
+        self.downsample = nn.Conv2d(256, 256, 5, 4, padding=1)
 
     def forward(self, x_query, v_query, r, u, gen_hidden, state, hidden):
 
         downsampled_u = self.downsample(u)
-        concatenated = torch.cat([x_query, v_query, r, downsampled_u, gen_hidden, hidden])
+        concatenated = torch.cat([x_query, v_query, r, downsampled_u, gen_hidden, hidden], dim=1)
         hidden, state = self.clstm(concatenated, state)
 
         return hidden, state
