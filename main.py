@@ -14,6 +14,10 @@ L=12
 EPOCHS = 100
 shared=True
 
+sigma_i = torch.tensor([2.0])
+sigma_f = torch.tensor([0.7])
+sigma_n = torch.tensor([2.0 * 1e5])
+
 
 
 if __name__ == '__main__':
@@ -21,12 +25,12 @@ if __name__ == '__main__':
     ds = GQNDataset(mode='train', base_dir='data', scene='rooms_ring_camera')
     cameras, positions = ds[0]
 
-    qgn = GQN(shared=shared, L=L)
+    qgn = GQN(shared, L, sigma_i, sigma_f, sigma_n)
 
     optimizer = optim.Adam(qgn.parameters(), lr=1e-3)
 
     writer = SummaryWriter()
-    global_step = 0
+    global_step = torch.tensor([0])
 
     for epoch in range(EPOCHS):
 
@@ -36,7 +40,7 @@ if __name__ == '__main__':
             p = torch.from_numpy(pos_batch[:,0:5, ...])
             x_q = torch.from_numpy(view_batch[:, -1, ...])
             p_q = torch.from_numpy(pos_batch[:, -1, ...])
-            output_image, target_image, priors, posteriors = qgn(x, p, x_q, p_q)
+            output_image, target_image, priors, posteriors = qgn(x, p, x_q, p_q, global_step, training=True)
 
             global_step += 1
             loss = loss(output_image, target_image, priors, posteriors)

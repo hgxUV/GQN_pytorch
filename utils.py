@@ -19,6 +19,10 @@ def distribution_loss(prior, posterior, no_features):
         dist_loss = dist_loss.mean()
         return dist_loss
 
+def get_pixel_std(sigma_i, sigma_f, sigma_n, global_step):
+    sigma = torch.max(sigma_f + (sigma_i - sigma_f)(1 - global_step / sigma_n), sigma_f)
+    return sigma
+
 
 class Latent(nn.Module):
 
@@ -47,19 +51,17 @@ class Latent(nn.Module):
 
 class ImageReconstruction(nn.Module):
 
-    def __init__(self, in_channels, out_channels, kernel_size, sigma):
+    def __init__(self, in_channels, out_channels, kernel_size):
         super(ImageReconstruction, self).__init__()
-
-        self.sigma = sigma
 
         self.rgb_means_conv = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size),
             nn.ReLU()
         )
 
-    def forward(self, input):
+    def forward(self, input, sigma):
         rgb_means_conv = self.RGB_means_conv(input)
-        stds = torch.ones(rgb_means_conv.shape) * self.sigma
+        stds = torch.ones(rgb_means_conv.shape) * sigma
         dist =torch.distributions.Normal(loc=rgb_means_conv, scale=stds)
         x_pred = dist.sample()
         return x_pred

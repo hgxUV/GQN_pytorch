@@ -6,16 +6,19 @@ from convLSTM import ConvLSTM
 from utils import Latent, ImageReconstruction
 import numpy as np
 from GQN_modules import Inference, Generator
-from utils import Latent, ImageReconstruction
+from utils import Latent, ImageReconstruction, get_pixel_std
 
 
 class GQN(nn.Module):
-    def __init__(self, shared, L):
+    def __init__(self, shared, L, sigma_i, sigma_f, sigma_n):
         super(GQN, self).__init__()
 
         self.shared = shared
         self.L = L
         self.tower = Tower()
+        self.sigma_i = sigma_i
+        self.sigma_f = sigma_f
+        self.sigma_n = sigma_n
 
         if shared:
             self.inference = Inference()
@@ -26,9 +29,9 @@ class GQN(nn.Module):
 
         self.prior_net = Latent(256, 256, 5)
         self.posterior_net = Latent(256, 256, 5)
-        self.img_reconstructor = ImageReconstruction(256, 3, 5, 3)
+        self.img_reconstructor = ImageReconstruction(256, 3, 5)
 
-    def forward(self, x, p, x_q, p_q, training=True):
+    def forward(self, x, p, x_q, p_q, global_step, training=True):
         r = self.tower(x, p)
         x_q = F.interpolate(x_q, scale_factor=1/4.0, mode='bilinear')
 
@@ -76,4 +79,6 @@ class GQN(nn.Module):
                 #r, v_query, z, state, hidden, u
                 gen_s, gen_h, u = self.generation(r, p_q, params, gen_s, gen_h, u)
 
-        return self.img_reconstructor(u), priors, posteriors
+        sigma = get_pixel_std(self.sigma_i, self.sigma_f, self.sigma_n, global_step)
+
+        return self.img_reconstructor(u, sigma), priors, posteriors
