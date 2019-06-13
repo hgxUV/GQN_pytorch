@@ -12,7 +12,7 @@ BATCH_SIZE = 32
 N = 5000
 L=12
 EPOCHS = 100
-shared=False
+shared=True
 
 
 
