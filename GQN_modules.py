@@ -8,7 +8,7 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
 
         self.clstm = ConvLSTM(519, 256, 5)
-        self.upsample = nn.ConvTranspose2D(256, 256, 4)
+        self.upsample = nn.ConvTranspose2d(256, 256, 4)
         self.ones = np.ones((10, 10))
 
     def forward(self, r, v_query, z, state, hidden, u):
@@ -25,12 +25,12 @@ class Inference(nn.Module):
         super(Inference, self).__init__()
 
         self.clstm = ConvLSTM(552, 256, 5)
-        self.downsample = nn.Conv2D(256, 256, 5, 2)
+        self.downsample = nn.Conv2d(256, 256, 5, 2)
 
-    def forward(self, x_query, v_query, r, z, u, gen_hidden, state, hidden):
+    def forward(self, x_query, v_query, r, u, gen_hidden, state, hidden):
 
         downsampled_u = self.downsample(u)
-        concatenated = torch.cat([x_query, v_query, r, z, downsampled_u, gen_hidden, hidden])
+        concatenated = torch.cat([x_query, v_query, r, downsampled_u, gen_hidden, hidden])
         hidden, state = self.clstm(concatenated, state)
 
         return hidden, state
