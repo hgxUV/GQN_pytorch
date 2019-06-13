@@ -23,6 +23,12 @@ class GQN(nn.Module):
             self.generation = nn.ModuleList([Generator() for _ in range(L)])
 
     def forward(self, x, p, x_q, p_q):
+        r = self.tower(x, p_q)
+
+        if self.shared:
+            for i in range(self.L):
+                self.inference[i]()
+
 
         # MAIN NETWORK HERE
 
