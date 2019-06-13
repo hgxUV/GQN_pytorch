@@ -10,7 +10,7 @@ import torch
 
 BATCH_SIZE = 32
 N = 5000
-L=12
+L=2
 EPOCHS = 100
 shared=True
 
@@ -40,7 +40,7 @@ if __name__ == '__main__':
             p = torch.from_numpy(pos_batch[:,0:5, ...])
             x_q = torch.from_numpy(view_batch[:, -1, ...])
             p_q = torch.from_numpy(pos_batch[:, -1, ...])
-            output_image, target_image, priors, posteriors = qgn(x, p, x_q, p_q, global_step, training=True)
+            output_image, priors, posteriors = qgn(x, p, x_q, p_q, global_step.float(), training=True)
 
             global_step += 1
             loss = loss(output_image, target_image, priors, posteriors)
