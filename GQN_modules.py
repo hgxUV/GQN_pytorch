@@ -7,15 +7,16 @@ class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
 
-        self.clstm = ConvLSTM(519, 256, 5)
-        self.upsample = nn.ConvTranspose2d(256, 256, 4)
+        self.clstm = ConvLSTM(775, 256, 5)
+        self.upsample = nn.ConvTranspose2d(256, 256, 4, stride=4, padding=0)
         self.ones = np.ones((10, 10))
 
     def forward(self, r, v_query, z, state, hidden, u):
 
-        concatenated = torch.cat([r, v_query, z, hidden])
+        concatenated = torch.cat([r, v_query, z, hidden], dim=1)
         hidden, state = self.clstm(concatenated, state)
-        u += self.upsample(hidden)
+        upsampled_h = self.upsample(hidden)
+        u += upsampled_h
 
         return hidden, state, u
 
