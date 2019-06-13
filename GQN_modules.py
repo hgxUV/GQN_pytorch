@@ -19,6 +19,11 @@ class Generator(nn.Module):
 
         return hidden, state, u
 
+    def get_init_state(self, batch_size):
+        h = torch.zeros(batch_size, 256)
+        s = torch.zeros(batch_size, 256)
+        return h, s
+
 
 class Inference(nn.Module):
     def __init__(self):
@@ -34,3 +39,10 @@ class Inference(nn.Module):
         hidden, state = self.clstm(concatenated, state)
 
         return hidden, state
+
+    def get_init_state(self, batch_size):
+        h = torch.zeros(batch_size, 256)
+        s = torch.zeros(batch_size, 256)
+        u = torch.zeros(batch_size, 64, 64, 3)
+        return h, s, u
+

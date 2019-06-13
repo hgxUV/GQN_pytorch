@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tensorboardX import SummaryWriter
 from utils import loss
+import torch
 
 BATCH_SIZE = 32
 N = 5000
@@ -31,10 +32,10 @@ if __name__ == '__main__':
 
         for i in range(0, N, BATCH_SIZE):
             view_batch, pos_batch = cameras[i:i+BATCH_SIZE], positions[i:i+BATCH_SIZE]
-            x = view_batch[:,0:5, ...]
-            p = pos_batch[:,0:5, ...]
-            x_q = view_batch[:, -1, ...]
-            p_q = pos_batch[:, -1, ...]
+            x = torch.from_numpy(view_batch[:,0:5, ...])
+            p = torch.from_numpy(pos_batch[:,0:5, ...])
+            x_q = torch.from_numpy(view_batch[:, -1, ...])
+            p_q = torch.from_numpy(pos_batch[:, -1, ...])
             output_image, target_image, priors, posteriors = qgn(x, p, x_q, p_q)
 
             global_step += 1
@@ -44,3 +45,5 @@ if __name__ == '__main__':
 
             loss.backward()
             optimizer.step()
+
+        torch.save(qgn.state_dict(), '/checkpoints/model.pt')
