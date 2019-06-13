@@ -37,6 +37,7 @@ class GQNDataset:
 
         images_list, poses_list = list(zip(*data))
         images_seqs = np.array(images_list).astype('float32')
+        images_seqs *= 1.0 / 255.0
         images_seqs = np.rollaxis(images_seqs, 4, 2)
         poses_seqs = np.array(poses_list)
         pos = poses_seqs[:, :, 0:3]
