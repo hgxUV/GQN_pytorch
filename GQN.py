@@ -22,10 +22,8 @@ class GQN(nn.Module):
             self.inference = nn.ModuleList([Inference() for _ in range(L)])
             self.generation = nn.ModuleList([Generator() for _ in range(L)])
 
-    def forward(self, r, v_query, z, state, hidden, u):
+    def forward(self, x, p, x_q, p_q):
 
-        concatenated = torch.cat([r, v_query, z, hidden])
-        hidden, state = self.clstm(concatenated, state)
-        u += self.upsample(hidden)
+        # MAIN NETWORK HERE
 
-        return hidden, state, u
+        return 0
