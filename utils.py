@@ -26,17 +26,18 @@ class Latent(nn.Module):
         super(Latent, self).__init__()
 
         self.no_features = in_channels
-        self.gaussian_params_conv = nn.Conv2d(in_channels, out_channels, kernel_size)
+        self.gaussian_params_conv = nn.Conv2d(in_channels, out_channels*2, kernel_size, padding=2)
+        self.softplus = nn.Softplus()
 
     def forward(self, input):
 
         gaussian_params = self.gaussian_params_conv(input)
 
-        means = gaussian_params[:, :, :, 0:self.no_features]
-        stds = gaussian_params[:, :, :, self.no_features:]
-        stds = nn.Softplus(stds)
+        means = gaussian_params[:, 0:self.no_features, ...]
+        stds = gaussian_params[:, self.no_features:, ...]
+        stds = self.softplus(stds)
 
-        gaussian_params = torch.cat((stds, means), -1)
+        gaussian_params = torch.cat((stds, means), 1)
 
         distributions = torch.distributions.Normal(loc=means, scale=means)
         latent = distributions.sample()
