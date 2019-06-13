@@ -45,6 +45,6 @@ class Inference(nn.Module):
     def get_init_state(cls, batch_size):
         h = torch.zeros(batch_size, 256, 16, 16)
         s = torch.zeros(batch_size, 256, 16, 16)
-        u = torch.zeros(batch_size, 64, 64, 256)
+        u = torch.zeros(batch_size, 256, 64, 64)
         return h, s, u
 
