@@ -16,7 +16,7 @@ class Generator(nn.Module):
         concatenated = torch.cat([r, v_query, z, hidden], dim=1)
         hidden, state = self.clstm(concatenated, state)
         upsampled_h = self.upsample(hidden)
-        u += upsampled_h
+        u = u + upsampled_h
 
         return hidden, state, u
 

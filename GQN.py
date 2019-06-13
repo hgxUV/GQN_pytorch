@@ -10,7 +10,7 @@ from utils import Latent, ImageReconstruction, get_pixel_std
 
 
 class GQN(nn.Module):
-    def __init__(self, shared, L, sigma_i, sigma_f, sigma_n):
+    def __init__(self, shared, L, sigma_i, sigma_f, sigma_n, device):
         super(GQN, self).__init__()
 
         self.shared = shared
@@ -19,6 +19,7 @@ class GQN(nn.Module):
         self.sigma_i = sigma_i
         self.sigma_f = sigma_f
         self.sigma_n = sigma_n
+        self.device = device
 
         if shared:
             self.inference = Inference()
@@ -29,7 +30,7 @@ class GQN(nn.Module):
 
         self.prior_net = Latent(256, 256, 5)
         self.posterior_net = Latent(256, 256, 5)
-        self.img_reconstructor = ImageReconstruction(256, 3, 5)
+        self.img_reconstructor = ImageReconstruction(256, 3, 5, device)
 
     def forward(self, x, p, x_q, p_q, global_step, training=True):
         r = self.tower(x, p)
@@ -44,6 +45,13 @@ class GQN(nn.Module):
 
         gen_h, gen_s, u = Inference.get_init_state(x.shape[0])
         inf_h, inf_s = Generator.get_init_state(x.shape[0])
+
+        gen_h = gen_h.to(self.device)
+        gen_s = gen_s.to(self.device)
+        u = u.to(self.device)
+
+        inf_h = inf_h.to(self.device)
+        inf_s = inf_s.to(self.device)
 
         posteriors = []
         priors = []

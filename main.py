@@ -29,12 +29,14 @@ if __name__ == '__main__':
     cameras, positions = ds[0]
     tc, tp = ts[0]
 
-    qgn = GQN(shared, L, sigma_i, sigma_f, sigma_n)
+    device = torch.device("cuda:0")
+    qgn = GQN(shared, L, sigma_i.to(device), sigma_f.to(device), sigma_n.to(device), device)
+    qgn.to(device)
 
     optimizer = optim.Adam(qgn.parameters(), lr=1e-3)
 
     writer = SummaryWriter()
-    global_step = torch.tensor([0])
+    global_step = torch.tensor([0]).to(device)
 
     test_i = 0
 
@@ -42,10 +44,10 @@ if __name__ == '__main__':
 
         for i in range(0, N, BATCH_SIZE):
             view_batch, pos_batch = cameras[i:i+BATCH_SIZE], positions[i:i+BATCH_SIZE]
-            x = torch.from_numpy(view_batch[:,0:5, ...])
-            p = torch.from_numpy(pos_batch[:,0:5, ...])
-            x_q = torch.from_numpy(view_batch[:, -1, ...])
-            p_q = torch.from_numpy(pos_batch[:, -1, ...])
+            x = torch.from_numpy(view_batch[:,0:5, ...]).to(device)
+            p = torch.from_numpy(pos_batch[:,0:5, ...]).to(device)
+            x_q = torch.from_numpy(view_batch[:, -1, ...]).to(device)
+            p_q = torch.from_numpy(pos_batch[:, -1, ...]).to(device)
             output_image, priors, posteriors = qgn(x, p, x_q, p_q, global_step.float(), training=True)
 
             global_step += 1
@@ -67,10 +69,10 @@ if __name__ == '__main__':
 
             if i % 100 == 0:
                 view_batch, pos_batch = tc[test_i:test_i + BATCH_SIZE], tp[test_i:test_i + BATCH_SIZE]
-                x = torch.from_numpy(view_batch[:, 0:5, ...])
-                p = torch.from_numpy(pos_batch[:, 0:5, ...])
-                x_q = torch.from_numpy(view_batch[:, -1, ...])
-                p_q = torch.from_numpy(pos_batch[:, -1, ...])
+                x = torch.from_numpy(view_batch[:, 0:5, ...]).to(device)
+                p = torch.from_numpy(pos_batch[:, 0:5, ...]).to(device)
+                x_q = torch.from_numpy(view_batch[:, -1, ...]).to(device)
+                p_q = torch.from_numpy(pos_batch[:, -1, ...]).to(device)
                 output_image, target_image, priors, posteriors = qgn(x, p, x_q, p_q, global_step, training=False)
                 test_i += BATCH_SIZE
 
