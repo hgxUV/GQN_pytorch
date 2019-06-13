@@ -21,8 +21,8 @@ class Generator(nn.Module):
 
     @classmethod
     def get_init_state(cls, batch_size):
-        h = torch.zeros(batch_size, 256)
-        s = torch.zeros(batch_size, 256)
+        h = torch.zeros(batch_size, 256, 16, 16)
+        s = torch.zeros(batch_size, 256, 16, 16)
         return h, s
 
 
@@ -43,8 +43,8 @@ class Inference(nn.Module):
 
     @classmethod
     def get_init_state(cls, batch_size):
-        h = torch.zeros(batch_size, 256)
-        s = torch.zeros(batch_size, 256)
-        u = torch.zeros(batch_size, 64, 64, 3)
+        h = torch.zeros(batch_size, 256, 16, 16)
+        s = torch.zeros(batch_size, 256, 16, 16)
+        u = torch.zeros(batch_size, 3, 64, 64)
         return h, s, u
 
