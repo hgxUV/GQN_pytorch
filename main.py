@@ -23,7 +23,10 @@ sigma_n = torch.tensor([2.0 * 1e5])
 if __name__ == '__main__':
 
     ds = GQNDataset(mode='train', base_dir='data', scene='rooms_ring_camera')
+    ts = GQNDataset(mode='test', base_dir='data', scene='rooms_ring_camera')
+
     cameras, positions = ds[0]
+    tc, tp = ts[0]
 
     qgn = GQN(shared, L, sigma_i, sigma_f, sigma_n)
 
@@ -31,6 +34,8 @@ if __name__ == '__main__':
 
     writer = SummaryWriter()
     global_step = torch.tensor([0])
+
+    test_i = 0
 
     for epoch in range(EPOCHS):
 
@@ -51,3 +56,12 @@ if __name__ == '__main__':
             optimizer.step()
 
         torch.save(qgn.state_dict(), '/checkpoints/model.pt')
+
+        if epoch % 50 == 0:
+            view_batch, pos_batch = tc[test_i:test_i + BATCH_SIZE], tp[test_i:test_i + BATCH_SIZE]
+            x = torch.from_numpy(view_batch[:, 0:5, ...])
+            p = torch.from_numpy(pos_batch[:, 0:5, ...])
+            x_q = torch.from_numpy(view_batch[:, -1, ...])
+            p_q = torch.from_numpy(pos_batch[:, -1, ...])
+            output_image, target_image, priors, posteriors = qgn(x, p, x_q, p_q, global_step, training=False)
+            test_i += BATCH_SIZE
