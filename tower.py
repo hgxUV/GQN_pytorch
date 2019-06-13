@@ -16,10 +16,10 @@ class Tower(nn.Module):
 
     def forward(self, x, view):
         v1 = view.unsqueeze(-1)
-        v2 = v1.expand((5, 7, 16))
+        v2 = v1.expand((v1.shape[0], 5, 7, 16))
 
         v3 = v2.unsqueeze(-1)
-        v4 = v3.expand((5, 7, 16, 16))
+        v4 = v3.expand((v1.shape[0], 5, 7, 16, 16))
 
         x = F.relu(self.layer1(x))
         y = F.relu(self.layer2(x))
