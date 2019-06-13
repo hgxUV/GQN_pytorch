@@ -28,7 +28,7 @@ class GQN(nn.Module):
         self.posterior_net = Latent(256, 256, 5)
         self.img_reconstructor = ImageReconstruction(256, 3, 5, 3)
 
-    def forward(self, x, p, x_q, p_q):
+    def forward(self, x, p, x_q, p_q, training=True):
         r = self.tower(x, p)
         x_q = F.interpolate(x_q, scale_factor=1/4.0, mode='bilinear')
 
@@ -55,7 +55,7 @@ class GQN(nn.Module):
                 prior_z, prior_params = self.prior_net(gen_h)
                 priors.append(prior_params)
 
-                params = post_z if DUPA else prior_z
+                params = post_z if training else prior_z
 
                 #r, v_query, z, state, hidden, u
                 gen_s, gen_h, u = self.generation[i](r, p_q, params, gen_s, gen_h, u)
@@ -71,7 +71,7 @@ class GQN(nn.Module):
                 prior_z, prior_params = self.prior_net(gen_h)
                 priors.append(prior_params)
 
-                params = post_z if DUPA else prior_z
+                params = post_z if training else prior_z
 
                 #r, v_query, z, state, hidden, u
                 gen_s, gen_h, u = self.generation(r, p_q, params, gen_s, gen_h, u)
