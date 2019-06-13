@@ -30,8 +30,8 @@ class GQN(nn.Module):
     def forward(self, x, p, x_q, p_q):
         r = self.tower(x, p)
 
-        gen_h, gen_s, u = self.generation.get_init_state(x.shape[0])
-        inf_h, inf_s = self.inference.get_init_state(x.shape[0])
+        gen_h, gen_s, u = Inference.get_init_state(x.shape[0])
+        inf_h, inf_s = Generator.get_init_state(x.shape[0])
 
         if self.shared:
             for i in range(self.L):
