@@ -42,7 +42,6 @@ class GQN(nn.Module):
         gen_h, gen_s, u = Inference.get_init_state(x.shape[0])
         inf_h, inf_s = Generator.get_init_state(x.shape[0])
 
-        if not self.shared:
         posteriors = []
         priors = []
 
@@ -50,11 +49,13 @@ class GQN(nn.Module):
             for i in range(self.L):
                 #x_query, v_query, r, z, u, gen_hidden, state, hidden
                 inf_s, inf_h = self.inference[i](x_q, p_q, r, u, gen_h, inf_s, inf_h)
-                z, post_params = self.posterior_net(inf_h)
+                post_z, post_params = self.posterior_net(inf_h)
+                posteriors.append(post_params)
 
-                z, prior_params = self.prior_net(gen_h)
+                prior_z, prior_params = self.prior_net(gen_h)
+                priors.append(prior_params)
 
-                params = post_params if DUPA else prior_params
+                params = post_z if DUPA else prior_z
 
                 #r, v_query, z, state, hidden, u
                 gen_s, gen_h, u = self.generation[i](r, p_q, params, gen_s, gen_h, u)
@@ -64,13 +65,15 @@ class GQN(nn.Module):
             for i in range(self.L):
                 #x_query, v_query, r, z, u, gen_hidden, state, hidden
                 inf_s, inf_h = self.inference(x_q, p_q, r, u, gen_h, inf_s, inf_h)
-                z, post_params = self.posterior_net(inf_h)
+                post_z, post_params = self.posterior_net(inf_h)
+                posteriors.append(post_params)
 
-                z, prior_params = self.prior_net(gen_h)
+                prior_z, prior_params = self.prior_net(gen_h)
+                priors.append(prior_params)
 
-                params = post_params if DUPA else prior_params
+                params = post_z if DUPA else prior_z
 
                 #r, v_query, z, state, hidden, u
                 gen_s, gen_h, u = self.generation(r, p_q, params, gen_s, gen_h, u)
 
-        return self.img_reconstructor(u)
+        return self.img_reconstructor(u), priors, posteriors
