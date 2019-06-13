@@ -54,10 +54,13 @@ if __name__ == '__main__':
             writer.add_scalar('model loss', model_loss, global_step)
             writer.add_scalar('dist loss', dist_loss, global_step)
 
-            output_img = np.rollaxis(output_image.detach().numpy(), 1, 4)[0]
-            input_images = np.rollaxis(output_image.detach().numpy(), 1, 4)[0]
-            writer.add_image('output_image', output_img, global_step)
-            writer.add_image('input_images', input_images, global_step)
+            writer.add_image('output_image', output_image[0], global_step)
+            writer.add_image('input_image_1', x[0][0], global_step)
+            writer.add_image('input_image_2', x[0][1], global_step)
+            writer.add_image('input_image_3', x[0][2], global_step)
+            writer.add_image('input_image_4', x[0][3], global_step)
+            writer.add_image('input_image_5', x[0][4], global_step)
+
 
             total_loss.backward()
             optimizer.step()
