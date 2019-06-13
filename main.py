@@ -10,9 +10,10 @@ import torch
 
 BATCH_SIZE = 32
 N = 5000
-L=2
+L=1
 EPOCHS = 100
 shared=True
+NO_FEATURES = 256
 
 sigma_i = torch.tensor([2.0])
 sigma_f = torch.tensor([0.7])
@@ -48,11 +49,17 @@ if __name__ == '__main__':
             output_image, priors, posteriors = qgn(x, p, x_q, p_q, global_step.float(), training=True)
 
             global_step += 1
-            loss = loss(output_image, target_image, priors, posteriors)
-            writer.add_scalar('loss', loss, global_step)
-            writer.add_image('output_image', output_image, global_step)
+            total_loss, model_loss, dist_loss = loss(output_image, x_q, priors, posteriors, NO_FEATURES)
+            writer.add_scalar('total loss', total_loss, global_step)
+            writer.add_scalar('model loss', model_loss, global_step)
+            writer.add_scalar('dist loss', dist_loss, global_step)
 
-            loss.backward()
+            output_img = np.rollaxis(output_image.detach().numpy(), 1, 4)[0]
+            input_images = np.rollaxis(output_image.detach().numpy(), 1, 4)[0]
+            writer.add_image('output_image', output_img, global_step)
+            writer.add_image('input_images', input_images, global_step)
+
+            total_loss.backward()
             optimizer.step()
 
             if i % 100 == 0:

@@ -2,20 +2,23 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-def loss(output_image, target_image, priors, posteriors):
+def loss(output_image, target_image, priors, posteriors, no_features):
     model_loss = nn.MSELoss()(output_image, target_image)
-    dist_loss = distribution_loss(priors, posteriors)
+    dist_loss = distribution_loss(priors, posteriors, no_features)
     #regularization_loss = tf.scalar_mul(1000, tf.losses.get_regularization_loss())
     total_loss = model_loss + dist_loss
     return total_loss, model_loss, dist_loss
 
 
 def distribution_loss(prior, posterior, no_features):
-        distritution = lambda x: torch.distributions.Normal(loc=x[:, :, :, 0:no_features],
-                                                         scale=x[:, :, :, no_features:])
+        distritution = lambda x: torch.distributions.Normal(loc=x[:, 0:no_features, ...],
+                                                         scale=x[:, no_features:, ...])
+        prior = torch.cat(prior)
+        posterior = torch.cat(posterior)
         prior = distritution(prior)
         posterior = distritution(posterior)
-        dist_loss = F.kl_div(posterior, prior)
+        dist_loss = torch.distributions.kl.kl_divergence(prior, posterior)
+        #dist_loss = F.kl_div(posterior, prior)
         dist_loss = dist_loss.mean()
         return dist_loss
 
