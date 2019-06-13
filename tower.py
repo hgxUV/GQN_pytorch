@@ -20,6 +20,9 @@ class Tower(nn.Module):
 
         v3 = v2.unsqueeze(-1)
         v4 = v3.expand((v1.shape[0], 5, 7, 16, 16))
+        v4 = v4.reshape(-1, 7, 16, 16)
+
+        x = x.reshape(-1, 3, 64, 64)
 
         x = F.relu(self.layer1(x))
         y = F.relu(self.layer2(x))
@@ -34,4 +37,6 @@ class Tower(nn.Module):
         x = F.relu(self.layer5(x))
         x = F.relu(self.layer6(x))
 
-        return x.sum(0)
+        x = x.reshape(-1, 5, 256, 16, 16)
+
+        return x.sum(1)
