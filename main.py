@@ -36,7 +36,7 @@ if __name__ == '__main__':
     optimizer = optim.Adam(qgn.parameters(), lr=1e-3)
 
     writer = SummaryWriter()
-    global_step = torch.tensor([0]).to(device)
+    global_step = torch.tensor([0.0]).to(device)
 
     test_i = 0
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
                 p = torch.from_numpy(pos_batch[:, 0:5, ...]).to(device)
                 x_q = torch.from_numpy(view_batch[:, -1, ...]).to(device)
                 p_q = torch.from_numpy(pos_batch[:, -1, ...]).to(device)
-                output_image, target_image, priors, posteriors = qgn(x, p, x_q, p_q, global_step, training=False)
+                output_image, priors, posteriors = qgn(x, p, x_q, p_q, global_step.float(), training=False)
                 test_i += BATCH_SIZE
 
         torch.save(qgn.state_dict(), '/checkpoints/model.pt')
