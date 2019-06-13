@@ -2,9 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-def loss(output_image, priors, posteriors, images, target_image):
-    model_loss = nn.MSELoss()
-    model_loss = (output_image, target_image)
+def loss(output_image, target_image, priors, posteriors):
+    model_loss = nn.MSELoss()(output_image, target_image)
     dist_loss = distribution_loss(priors, posteriors)
     #regularization_loss = tf.scalar_mul(1000, tf.losses.get_regularization_loss())
     total_loss = model_loss + dist_loss

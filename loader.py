@@ -38,8 +38,12 @@ class GQNDataset:
         images_list, poses_list = list(zip(*data))
         images_seqs = np.array(images_list)
         poses_seqs = np.array(poses_list)
+        pos = poses_seqs[:, :, 0:3]
+        yaw = poses_seqs[:, :, 3:4]
+        pitch = poses_seqs[:, :, 4:5]
+der        poses_with_angles = np.concatenate([pos, np.sin(yaw), np.cos(yaw), np.sin(pitch), np.cos(pitch)], axis=2)
 
-        return images_seqs, poses_seqs
+        return images_seqs, poses_with_angles
 
 
 
